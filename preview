@@ -1,0 +1,19 @@
+#!/bin/bash
+
+command=${1:?command is empty}
+input=${2:?input is empty}
+output=${3:?output is empty}
+interval=0.5
+
+while :
+do
+    while [[ $old == $new ]]
+    do
+        new=$(stat -c '%Y' "$input")
+        sleep $interval 
+    done
+    old=$new
+
+    $command "$input" > "$output"
+    echo -e "$(date +'%F %T'):\t$command '$input' > '$output'"
+done

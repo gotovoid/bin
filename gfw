@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# free ssh
+
+# PS4=':${BASH_SOURCE}:${LINENO}+'
+# set -x
+
+while :
+do
+    clear
+    echo "Connecting ..."
+    arr=($(
+            curl -s http://ssh.emdao.com/freessh.php |
+                iconv -f gbk -t utf8 |
+                    grep -Po '(?<=: ).*(?=<br />)'
+    ))
+    host=${arr[0]}
+    user=${arr[1]}
+    pass=${arr[2]}
+    port=9999
+    clear
+    echo "HOST: $host"
+    echo "USER: $user"
+    echo "PASS: $pass"
+    echo "PORT: $port"
+    echo "TIME: $(date +'%F %T')"
+    plink -N -D $port -pw $pass $user@$host &>/dev/null
+done
+

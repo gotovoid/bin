@@ -1,0 +1,58 @@
+#!/bin/bash
+# make new post for jekyll
+
+msg() {
+    echo -ne '\e[31;1m'
+    echo -ne "$1"
+    echo -ne '\e[0m'
+}
+
+if (($# == 0))
+then
+    msg "USAGE: $0 'hello world'\n"
+    exit 1
+fi
+
+######
+base=/home/kev/github/hjkl/_posts
+slug=$(echo -n $@ | sed -r 's/[^[:alnum:]]+/-/g')
+name="$(date +%F)-${slug}.md"
+post="${base}/${name}"
+
+######
+if find "$base" -iname "*$slug*" -and ! -name "$name" | grep ^
+then
+    msg '----\nsimilar post found, still create? ([Y]/N) '
+    read ans
+    if [[ $ans = [nN] ]]
+    then
+        exit 2
+    fi
+fi
+
+######
+if [[ -e $post ]]
+then
+    vim "$post"
+else
+    cat >"$post" <<-_EOF_
+		---
+		layout: post
+		title: $@
+		comments: true
+		category: uncategorized
+		tags: []
+		published: false
+		---
+_EOF_
+    vim "$post" +'%Tabularize /:\zs/' +w +$
+fi
+
+######
+msg "new post: $post\nsave or not? ([Y]/N) "
+read ans
+if [[ $ans = [nN] ]]
+then
+    rm "$post"
+fi
+

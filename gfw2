@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# free ssh
+
+cat >gfw.yql << "_EOF_"
+SELECT content
+FROM html
+WHERE url='https://www.usassh.com/free.php'
+    AND xpath='//font[@color="red"][not(contains(text(), "。"))]'
+LIMIT 1
+_EOF_
+
+while :
+do
+    clear
+    echo "Connecting ..."
+    host=free.usassh.com
+    user=usassh
+    pass=$(curl -s --data-urlencode 'q@gfw.yql' http://query.yahooapis.com/v1/public/yql |
+            xmlstarlet sel -t -m //font -v .)
+    port=9999
+    if [[ -z $pass ]]
+    then
+        continue
+    fi
+    clear
+    echo "HOST: $host"
+    echo "USER: $user"
+    echo "PASS: $pass"
+    echo "PORT: $port"
+    echo "TIME: $(date +'%F %T')"
+    plink -N -D $port -pw $pass $user@$host &>/dev/null
+done
+
+rm gfw.yql
