@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # free ssh
 
+trap "{ rm -f gfw.yql; exit 1; }" INT
+
 cat >gfw.yql << "_EOF_"
 SELECT content
 FROM html
@@ -31,4 +33,3 @@ do
     plink -N -D $port -pw $pass $user@$host &>/dev/null
 done
 
-rm gfw.yql
